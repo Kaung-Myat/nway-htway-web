@@ -1,7 +1,6 @@
 /* src/App.css */
 :root {
   /* --- TELEGRAM THEME MAPPING --- */
-  /* Fallbacks are provided after the comma */
   --primary: var(--tg-theme-button-color, #db2777);
   --primary-text: var(--tg-theme-button-text-color, #ffffff);
   --bg-color: var(--tg-theme-bg-color, #fdf2f8);
@@ -10,7 +9,7 @@
   --text-muted: var(--tg-theme-hint-color, #6b7280);
 
   --primary-light: #fbcfe8;
-  /* Keep this for accents */
+  /* Base color for accents */
 }
 
 body {
@@ -71,23 +70,18 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--card-bg);
-  /* Match card bg */
   border-radius: 50%;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Pure CSS Circular Progress trick */
 .cycle-circle-border {
   position: absolute;
   width: 100%;
   height: 100%;
   border-radius: 50%;
   border: 10px solid var(--primary-light);
-  /* Base circle */
   border-top-color: var(--primary);
-  /* Progress color */
   transition: transform 1s ease-out;
-  /* Smooth animation */
 }
 
 .cycle-text {
@@ -139,7 +133,6 @@ body {
   border-color: var(--primary);
   background: var(--primary-light);
   color: #000;
-  /* Ensure text is visible on light bg */
 }
 
 .mood-icon {
@@ -172,7 +165,7 @@ body {
   border-color: var(--primary);
 }
 
-/* --- Calendar Override --- */
+/* --- Calendar Styling --- */
 .react-calendar {
   width: 100% !important;
   border: none !important;
@@ -184,22 +177,61 @@ body {
   color: var(--text-main);
 }
 
-.react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
+.react-calendar__tile:enabled:hover {
   background-color: var(--primary-light);
   border-radius: 8px;
 }
 
-.react-calendar__tile--active {
-  background: var(--primary) !important;
-  color: var(--primary-text) !important;
-  border-radius: 8px;
+/* Calendar Logic Colors */
+.tile-past {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-radius: 50% !important;
+}
+
+.tile-predict {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  border-radius: 50% !important;
+  font-weight: bold;
+}
+
+.tile-fertile {
+  background-color: #10b981 !important;
+  color: white !important;
+  border-radius: 50% !important;
 }
 
 .react-calendar__tile--now {
-  background: var(--primary-light) !important;
+  background: transparent !important;
+  border: 1px solid var(--primary);
   border-radius: 8px;
-  color: #000 !important;
+  color: var(--text-main) !important;
+}
+
+/* Legend */
+.legend-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 10px;
+  background: var(--card-bg);
+  border-radius: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
 /* --- Navigation --- */
@@ -230,51 +262,4 @@ body {
 
 .nav-item.active {
   color: var(--primary);
-}
-
-.tile-past {
-  background-color: var(--primary) !important;
-  color: white !important;
-  border-radius: 50% !important;
-}
-
-/* 2. ခန့်မှန်းရက်များ (Prediction) - ပန်းရောင်ဖျော့ */
-.tile-predict {
-  background-color: var(--primary-light) !important;
-  color: var(--primary) !important;
-  border-radius: 50% !important;
-  font-weight: bold;
-}
-
-/* 3. မျိုးဥကြွေရက် (Ovulation) - အစိမ်းရောင် */
-.tile-fertile {
-  background-color: #10b981 !important;
-  /* Emerald Green */
-  color: white !important;
-  border-radius: 50% !important;
-}
-
-/* --- Legend (အညွှန်း) --- */
-.legend-container {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
-  padding: 10px;
-  background: var(--bg-color);
-  border-radius: 12px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
 }
