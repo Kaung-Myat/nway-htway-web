@@ -1,45 +1,57 @@
-/* src/App.css */
-:root {
-  /* --- TELEGRAM THEME MAPPING --- */
-  --primary: var(--tg-theme-button-color, #db2777);
-  --primary-text: var(--tg-theme-button-text-color, #ffffff);
-  --bg-color: var(--tg-theme-bg-color, #fdf2f8);
-  --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-  --text-main: var(--tg-theme-text-color, #1f2937);
-  --text-muted: var(--tg-theme-hint-color, #6b7280);
+/*
+ * Nway Htway Web App - CSS Styles
+ * This file contains all the styling for the menstrual cycle tracking application
+ * It integrates with Telegram's theme system and provides a clean, user-friendly interface
+ */
 
-  --primary-light: #fbcfe8;
+/* CSS Variables - Telegram Theme Integration */
+:root {
+  /* Primary colors mapped from Telegram theme */
+  --primary: var(--tg-theme-button-color, #db2777);           /* Primary button color from Telegram theme */
+  --primary-text: var(--tg-theme-button-text-color, #ffffff); /* Primary button text color from Telegram theme */
+  --bg-color: var(--tg-theme-bg-color, #fdf2f8);             /* Background color from Telegram theme */
+  --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);    /* Card background color from Telegram theme */
+  --text-main: var(--tg-theme-text-color, #1f2937);          /* Main text color from Telegram theme */
+  --text-muted: var(--tg-theme-hint-color, #6b7280);         /* Muted text color from Telegram theme */
+
+  /* Additional color variants for UI elements */
+  --primary-light: #fbcfe8;  /* Lighter shade of primary color for backgrounds */
 }
 
+/* Base styles for the entire application */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
 
+/* Main application container */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-width: 450px;
-  margin: 0 auto;
+  height: 100vh;           /* Full viewport height */
+  max-width: 450px;        /* Maximum width for mobile optimization */
+  margin: 0 auto;          /* Center the app on larger screens */
   background: var(--bg-color);
   position: relative;
 }
 
-/* --- Components --- */
+/* --- Common Components --- */
+
+/* Card component - used for grouping related content */
 .card {
   background: var(--card-bg);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
 }
 
+/* Primary button component */
 .btn-primary {
-  width: 100%;
+  width: 100%;                    /* Full width button */
   background-color: var(--primary);
   color: var(--primary-text);
   border: none;
@@ -48,45 +60,50 @@ body {
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s;       /* Smooth opacity transition on interaction */
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 8px;                      /* Space between icon and text */
 }
 
 .btn-primary:active {
-  opacity: 0.8;
+  opacity: 0.8;                  /* Visual feedback when pressed */
 }
 
-/* --- Dashboard --- */
+/* --- Dashboard Specific Styles --- */
+
+/* Circular progress indicator for cycle tracking */
 .cycle-progress {
   position: relative;
   width: 180px;
   height: 180px;
-  margin: 20px auto;
+  margin: 20px auto;             /* Center the progress circle */
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--card-bg);
-  border-radius: 50%;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);    /* Background for the progress circle */
+  border-radius: 50%;            /* Make it circular */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
+/* Border of the progress circle that shows completion */
 .cycle-circle-border {
   position: absolute;
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 10px solid var(--primary-light);
-  border-top-color: var(--primary);
-  transition: transform 1s ease-out;
+  border: 10px solid var(--primary-light);  /* Incomplete portion */
+  border-top-color: var(--primary);         /* Completed portion (top) */
+  transition: transform 1s ease-out;        /* Smooth animation for progress */
 }
 
+/* Text inside the progress circle */
 .cycle-text {
   text-align: center;
 }
 
+/* Current cycle day number */
 .cycle-day {
   font-size: 42px;
   font-weight: 800;
@@ -94,6 +111,7 @@ body {
   line-height: 1;
 }
 
+/* Label below the cycle day */
 .cycle-label {
   font-size: 14px;
   color: var(--text-muted);
@@ -101,7 +119,9 @@ body {
   letter-spacing: 1px;
 }
 
-/* --- Calendar Styling --- */
+/* --- Calendar Component Styles --- */
+
+/* Override react-calendar default styles to match app theme */
 .react-calendar {
   width: 100% !important;
   border: none !important;
@@ -118,13 +138,15 @@ body {
   border-radius: 8px;
 }
 
-/* Calendar Logic Colors */
+/* Calendar Day Type Colors */
+/* Past period days - solid primary color */
 .tile-past {
   background-color: var(--primary) !important;
   color: white !important;
   border-radius: 50% !important;
 }
 
+/* Predicted period days - light primary with bold text */
 .tile-predict {
   background-color: var(--primary-light) !important;
   color: var(--primary) !important;
@@ -132,12 +154,14 @@ body {
   font-weight: bold;
 }
 
+/* Fertile/ovulation days - green color */
 .tile-fertile {
-  background-color: #10b981 !important;
+  background-color: #10b981 !important;  /* Green color for fertile days */
   color: white !important;
   border-radius: 50% !important;
 }
 
+/* Current date indicator */
 .react-calendar__tile--now {
   background: transparent !important;
   border: 1px solid var(--primary);
@@ -145,57 +169,65 @@ body {
   color: var(--text-main) !important;
 }
 
-/* Legend */
+/* --- Legend Component --- */
+
+/* Container for the calendar legend */
 .legend-container {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 15px;                    /* Space between legend items */
   margin-top: 15px;
   padding: 10px;
   background: var(--card-bg);
   border-radius: 12px;
 }
 
+/* Individual legend item */
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 6px;                     /* Space between dot and text */
   font-size: 12px;
   color: var(--text-muted);
 }
 
+/* Color dot in the legend */
 .legend-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
 }
 
-/* --- Navigation --- */
+/* --- Navigation Component --- */
+
+/* Bottom navigation bar */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   width: 100%;
-  max-width: 450px;
+  max-width: 450px;             /* Match app container width */
   background: var(--card-bg);
   display: flex;
   justify-content: space-around;
   padding: 12px 0;
-  border-top: 1px solid var(--text-muted);
-  z-index: 10;
+  border-top: 1px solid var(--text-muted); /* Separator line */
+  z-index: 10;                  /* Ensure it stays above other content */
 }
 
+/* Individual navigation item */
 .nav-item {
   background: none;
   border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 4px;                     /* Space between icon and label */
   color: var(--text-muted);
   font-size: 11px;
   cursor: pointer;
 }
 
+/* Active navigation item */
 .nav-item.active {
-  color: var(--primary);
+  color: var(--primary);        /* Highlight active tab */
 }
