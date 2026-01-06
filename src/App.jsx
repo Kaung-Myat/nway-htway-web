@@ -2,26 +2,11 @@ import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
-import { Heart, Calendar as CalIcon, Activity, Save } from 'lucide-react';
+import { Heart, Calendar as CalIcon } from 'lucide-react'; // Activity Icon ဖြုတ်လိုက်ပါပြီ
 import './App.css';
 
-// ⚠️ YOUR BOT URL (Update if needed)
+// ⚠️ YOUR BOT URL
 const BOT_API_URL = "https://nway-htway-bot.vercel.app";
-
-const MOODS = [
-  { id: 'happy', icon: '😊', label: 'ပျော်' },
-  { id: 'sad', icon: '😢', label: 'ဝမ်းနည်း' },
-  { id: 'angry', icon: '😡', label: 'စိတ်တို' },
-  { id: 'tired', icon: '😴', label: 'ပင်ပန်း' },
-];
-
-const SYMPTOMS = [
-  { id: 'cramps', label: 'ဗိုက်နာ' },
-  { id: 'headache', label: 'ခေါင်းကိုက်' },
-  { id: 'acne', label: 'ဝက်ခြံ' },
-  { id: 'backpain', label: 'ခါးနာ' },
-  { id: 'bloating', label: 'လေပွ' },
-];
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -29,10 +14,8 @@ function App() {
   const [cycleData, setCycleData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Form Data
+  // Form Data (Date only now)
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
 
   // --- 1. Init & Fetch ---
   useEffect(() => {
@@ -49,7 +32,6 @@ function App() {
         const telegramUser = tg.initDataUnsafe.user;
         setUser(telegramUser);
 
-        // Fetch Real Data
         fetch(`${BOT_API_URL}/api/user?chatId=${telegramUser.id}`)
           .then(res => res.json())
           .then(data => {
@@ -61,7 +43,6 @@ function App() {
             setLoading(false);
           });
       } else {
-        // Local Dev Mock
         setUser({ first_name: "Test User" });
         setLoading(false);
       }
@@ -73,22 +54,13 @@ function App() {
   // --- 2. Logic Functions ---
   const sendDataToBot = (action) => {
     const tg = window.Telegram.WebApp;
+    // Mood/Symptoms မပါတော့ဘဲ Date ပဲ ပို့ပါမယ်
     const payload = {
       action: action,
-      date: selectedDate.toISOString(),
-      mood: selectedMood,
-      symptoms: selectedSymptoms
+      date: selectedDate.toISOString()
     };
     tg.sendData(JSON.stringify(payload));
     tg.close();
-  };
-
-  const toggleSymptom = (id) => {
-    if (selectedSymptoms.includes(id)) {
-      setSelectedSymptoms(selectedSymptoms.filter(s => s !== id));
-    } else {
-      setSelectedSymptoms([...selectedSymptoms, id]);
-    }
   };
 
   // --- Calendar Checkers ---
@@ -176,12 +148,6 @@ function App() {
         <button className="btn-primary" onClick={() => sendDataToBot('log_period')}>
           <Heart fill="white" size={20} /> ဒီနေ့ ရာသီလာတယ် (Log)
         </button>
-
-        <div style={{ marginTop: '16px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: 'var(--text-muted)' }} onClick={() => setActiveTab('log')}>
-            နေမကောင်းဘူးလား? <span style={{ color: 'var(--primary)', fontWeight: 'bold', cursor: 'pointer' }}>လက္ခဏာမှတ်မယ် 👉</span>
-          </p>
-        </div>
       </div>
     );
   };
@@ -216,53 +182,15 @@ function App() {
     </div>
   );
 
-  // Log Tab
-  const LoggerView = () => (
-    <div style={{ padding: '20px', paddingBottom: '80px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 className="section-title">📝 မှတ်တမ်းတင်မယ်</h2>
-        <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{format(selectedDate, 'MMM dd')}</span>
-      </div>
-
-      <div className="card">
-        <h3 className="section-title">စိတ်အခြေအနေ (Mood)</h3>
-        <div className="mood-grid">
-          {MOODS.map((m) => (
-            <div key={m.id} className={`mood-item ${selectedMood === m.id ? 'selected' : ''}`} onClick={() => setSelectedMood(m.id)}>
-              <span className="mood-icon">{m.icon}</span><span className="mood-label">{m.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="card">
-        <h3 className="section-title">ရောဂါလက္ခဏာ (Symptoms)</h3>
-        <div className="tags-container">
-          {SYMPTOMS.map((s) => (
-            <div key={s.id} className={`tag ${selectedSymptoms.includes(s.id) ? 'selected' : ''}`} onClick={() => toggleSymptom(s.id)}>
-              {s.label}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <button className="btn-primary" onClick={() => sendDataToBot('log_symptoms')}>
-        <Save size={20} /> သိမ်းဆည်းမယ် (Save)
-      </button>
-    </div>
-  );
-
   return (
     <div className="app-container">
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {activeTab === 'home' && <DashboardView />}
         {activeTab === 'calendar' && <CalendarView />}
-        {activeTab === 'log' && <LoggerView />}
       </div>
       <nav className="bottom-nav">
         <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}><Heart size={24} /><span>Home</span></button>
         <button className={`nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}><CalIcon size={24} /><span>Calendar</span></button>
-        <button className={`nav-item ${activeTab === 'log' ? 'active' : ''}`} onClick={() => setActiveTab('log')}><Activity size={24} /><span>Log</span></button>
       </nav>
     </div>
   );
