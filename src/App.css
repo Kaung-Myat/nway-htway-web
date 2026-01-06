@@ -231,3 +231,50 @@ body {
 .nav-item.active {
   color: var(--primary);
 }
+
+.tile-past {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-radius: 50% !important;
+}
+
+/* 2. ခန့်မှန်းရက်များ (Prediction) - ပန်းရောင်ဖျော့ */
+.tile-predict {
+  background-color: var(--primary-light) !important;
+  color: var(--primary) !important;
+  border-radius: 50% !important;
+  font-weight: bold;
+}
+
+/* 3. မျိုးဥကြွေရက် (Ovulation) - အစိမ်းရောင် */
+.tile-fertile {
+  background-color: #10b981 !important;
+  /* Emerald Green */
+  color: white !important;
+  border-radius: 50% !important;
+}
+
+/* --- Legend (အညွှန်း) --- */
+.legend-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 10px;
+  background: var(--bg-color);
+  border-radius: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
