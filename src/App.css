@@ -1,14 +1,16 @@
 /* src/App.css */
 :root {
-  --primary: #db2777;
-  /* Pink-600 */
+  /* --- TELEGRAM THEME MAPPING --- */
+  /* Fallbacks are provided after the comma */
+  --primary: var(--tg-theme-button-color, #db2777);
+  --primary-text: var(--tg-theme-button-text-color, #ffffff);
+  --bg-color: var(--tg-theme-bg-color, #fdf2f8);
+  --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+  --text-main: var(--tg-theme-text-color, #1f2937);
+  --text-muted: var(--tg-theme-hint-color, #6b7280);
+
   --primary-light: #fbcfe8;
-  /* Pink-200 */
-  --bg-color: #fdf2f8;
-  /* Pink-50 */
-  --white: #ffffff;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
+  /* Keep this for accents */
 }
 
 body {
@@ -24,7 +26,6 @@ body {
   flex-direction: column;
   height: 100vh;
   max-width: 450px;
-  /* Mobile View Only */
   margin: 0 auto;
   background: var(--bg-color);
   position: relative;
@@ -32,7 +33,7 @@ body {
 
 /* --- Components --- */
 .card {
-  background: var(--white);
+  background: var(--card-bg);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
@@ -42,7 +43,7 @@ body {
 .btn-primary {
   width: 100%;
   background-color: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: none;
   padding: 14px;
   border-radius: 12px;
@@ -69,9 +70,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--card-bg);
+  /* Match card bg */
   border-radius: 50%;
-  box-shadow: 0 10px 15px -3px rgba(219, 39, 119, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 /* Pure CSS Circular Progress trick */
@@ -81,9 +83,11 @@ body {
   height: 100%;
   border-radius: 50%;
   border: 10px solid var(--primary-light);
+  /* Base circle */
   border-top-color: var(--primary);
-  transform: rotate(-45deg);
-  /* Adjust based on progress */
+  /* Progress color */
+  transition: transform 1s ease-out;
+  /* Smooth animation */
 }
 
 .cycle-text {
@@ -126,7 +130,7 @@ body {
   gap: 5px;
   padding: 10px 5px;
   border-radius: 12px;
-  background: white;
+  background: var(--card-bg);
   border: 1px solid transparent;
   cursor: pointer;
 }
@@ -134,6 +138,8 @@ body {
 .mood-item.selected {
   border-color: var(--primary);
   background: var(--primary-light);
+  color: #000;
+  /* Ensure text is visible on light bg */
 }
 
 .mood-icon {
@@ -153,15 +159,16 @@ body {
 .tag {
   padding: 8px 16px;
   border-radius: 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--card-bg);
+  border: 1px solid var(--text-muted);
   font-size: 14px;
   cursor: pointer;
+  color: var(--text-main);
 }
 
 .tag.selected {
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border-color: var(--primary);
 }
 
@@ -170,17 +177,29 @@ body {
   width: 100% !important;
   border: none !important;
   background: transparent !important;
+  color: var(--text-main) !important;
+}
+
+.react-calendar__tile {
+  color: var(--text-main);
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: var(--primary-light);
+  border-radius: 8px;
 }
 
 .react-calendar__tile--active {
   background: var(--primary) !important;
-  color: white !important;
+  color: var(--primary-text) !important;
   border-radius: 8px;
 }
 
 .react-calendar__tile--now {
   background: var(--primary-light) !important;
   border-radius: 8px;
+  color: #000 !important;
 }
 
 /* --- Navigation --- */
@@ -189,11 +208,11 @@ body {
   bottom: 0;
   width: 100%;
   max-width: 450px;
-  background: white;
+  background: var(--card-bg);
   display: flex;
   justify-content: space-around;
   padding: 12px 0;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--text-muted);
   z-index: 10;
 }
 

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { format, differenceInDays, addDays } from 'date-fns';
-import { Heart, Calendar as CalIcon, Activity, ChevronRight, Save } from 'lucide-react';
+import { format } from 'date-fns';
+import { Heart, Calendar as CalIcon, Activity, Save } from 'lucide-react';
 import './App.css';
 
-// --- Constants & Data ---
+// ⚠️ CHANGE THIS TO YOUR BOT VERCEL URL
+const BOT_API_URL = "https://nway-htway-bot.vercel.app";
+
+// --- Constants ---
 const MOODS = [
   { id: 'happy', icon: '😊', label: 'ပျော်' },
   { id: 'sad', icon: '😢', label: 'ဝမ်းနည်း' },
@@ -22,15 +25,19 @@ const SYMPTOMS = [
 ];
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home'); // home, calendar, log
+  const [activeTab, setActiveTab] = useState('home');
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Data State
+  // Real Data State
+  const [cycleData, setCycleData] = useState(null);
+
+  // Form Data State
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
 
-  // --- 1. Init (Telegram Setup) ---
+  // --- 1. Init & Fetch Data ---
   useEffect(() => {
     // Check if running in Telegram
     if (window.Telegram?.WebApp) {
@@ -38,21 +45,35 @@ function App() {
       tg.ready();
       tg.expand();
 
-      // Theme Colors setting
+      // Theme Colors setting (Also handled in CSS, this is backup)
       const root = document.documentElement;
-      root.style.setProperty('--primary', tg.themeParams.button_color || '#db2777');
-      root.style.setProperty('--bg-color', tg.themeParams.secondary_bg_color || '#fdf2f8');
+      if (tg.themeParams.button_color) root.style.setProperty('--primary', tg.themeParams.button_color);
+      if (tg.themeParams.secondary_bg_color) root.style.setProperty('--bg-color', tg.themeParams.secondary_bg_color);
 
       if (tg.initDataUnsafe?.user) {
-        setUser(tg.initDataUnsafe.user);
+        const telegramUser = tg.initDataUnsafe.user;
+        setUser(telegramUser);
+
+        // 🔥 FETCH REAL DATA FROM BOT API
+        fetch(`${BOT_API_URL}/api/user?chatId=${telegramUser.id}`)
+          .then(res => res.json())
+          .then(data => {
+            setCycleData(data);
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error("Fetch Error:", err);
+            setLoading(false);
+          });
+
       } else {
-        // 🛠️ Local Dev အတွက် Mock Data (Telegram မဟုတ်ရင် ဒါပြမယ်)
-        setUser({ first_name: "Local User (Test)" });
+        // Local Dev Mock
+        setUser({ first_name: "Local User" });
+        setLoading(false);
       }
     } else {
-      // Telegram Script မရှိရင်တောင် မပျက်သွားအောင် ကာကွယ်ခြင်း
-      console.log("Telegram WebApp Script not loaded yet.");
-      setUser({ first_name: "Developer" });
+      console.log("Telegram Script missing");
+      setLoading(false);
     }
   }, []);
 
@@ -67,15 +88,12 @@ function App() {
 
   const sendDataToBot = (action) => {
     const tg = window.Telegram.WebApp;
-
-    // Data Object to send
     const payload = {
-      action: action, // 'log_period' or 'log_symptoms'
+      action: action,
       date: selectedDate.toISOString(),
       mood: selectedMood,
       symptoms: selectedSymptoms
     };
-
     tg.sendData(JSON.stringify(payload));
     tg.close();
   };
@@ -84,28 +102,66 @@ function App() {
 
   // SCREEN 1: Dashboard
   const DashboardView = () => {
-    // Note: In a real app, you would fetch the 'lastPeriodDate' from API.
-    // For now, let's assume Cycle Day 14 for demo visually.
-    const cycleDay = 14;
+    if (loading) {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <p>အချက်အလက်များကို ရယူနေပါသည်...</p>
+        </div>
+      );
+    }
+
+    // Case A: No Data Found (New User)
+    if (!cycleData || !cycleData.found) {
+      return (
+        <div style={{ padding: '20px', textAlign: 'center', marginTop: '50px' }}>
+          <h2>မင်္ဂလာပါ {user?.first_name || 'Sis'}! 👋</h2>
+          <div className="card">
+            <p>ရာသီမှတ်တမ်း မရှိသေးပါဘူးရှင်။</p>
+            <p style={{ color: 'var(--text-muted)' }}>စတင်မှတ်သားဖို့ အောက်ကခလုတ်ကို နှိပ်လိုက်ပါ။ 👇</p>
+          </div>
+          <button className="btn-primary" onClick={() => sendDataToBot('log_period')}>
+            <Heart fill="white" size={20} />
+            ဒီနေ့ ရာသီလာတယ် (စမှတ်မယ်)
+          </button>
+        </div>
+      );
+    }
+
+    // Case B: Data Exists (Calculate Visuals)
+    let displayDay = cycleData.cycleLength - cycleData.daysUntil;
+    let progressDeg = (displayDay / cycleData.cycleLength) * 360;
+
+    // Logic for "Late"
+    let statusText = <>နောက်ရာသီလာဖို့ <strong>{cycleData.daysUntil} ရက်</strong> လိုပါသေးတယ်။</>;
+    if (cycleData.daysUntil <= 0) {
+      displayDay = "Late";
+      progressDeg = 360; // Full circle
+      statusText = <>ရာသီလာမယ့်ရက်ထက် <strong>{Math.abs(cycleData.daysUntil)} ရက်</strong> ကျော်လွန်နေပါတယ်။</>;
+    }
 
     return (
       <div style={{ padding: '20px', paddingBottom: '80px' }}>
         <div style={{ marginBottom: '20px' }}>
           <h2 style={{ margin: 0, fontSize: '24px' }}>မင်္ဂလာပါ {user?.first_name || 'Sis'}! 👋</h2>
-          <p style={{ margin: '4px 0', color: '#6b7280' }}>ဒီနေ့ ကျန်းမာရေး ဂရုစိုက်နော်</p>
+          <p style={{ margin: '4px 0', color: 'var(--text-muted)' }}>ဒီနေ့ ကျန်းမာရေး ဂရုစိုက်နော်</p>
         </div>
 
         <div className="card">
           <div className="cycle-progress">
-            <div className="cycle-circle-border" style={{ transform: `rotate(${cycleDay * 12}deg)` }}></div>
+            <div
+              className="cycle-circle-border"
+              style={{ transform: `rotate(${progressDeg}deg)` }}
+            ></div>
             <div className="cycle-text">
-              <span className="cycle-day">Day {cycleDay}</span>
+              <span className="cycle-day">
+                {typeof displayDay === 'number' ? `Day ${displayDay}` : displayDay}
+              </span>
               <br />
               <span className="cycle-label">of Cycle</span>
             </div>
           </div>
           <p style={{ textAlign: 'center', margin: 0 }}>
-            နောက်ရာသီလာဖို့ <strong>14 ရက်</strong> လိုပါသေးတယ်။
+            {statusText}
           </p>
         </div>
 
@@ -115,8 +171,8 @@ function App() {
         </button>
 
         <div style={{ marginTop: '16px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: '#666' }} onClick={() => setActiveTab('log')}>
-            နေမကောင်းဘူးလား? <span style={{ color: '#db2777', fontWeight: 'bold' }}>လက္ခဏာမှတ်မယ် 👉</span>
+          <p style={{ fontSize: '14px', color: 'var(--text-muted)' }} onClick={() => setActiveTab('log')}>
+            နေမကောင်းဘူးလား? <span style={{ color: 'var(--primary)', fontWeight: 'bold', cursor: 'pointer' }}>လက္ခဏာမှတ်မယ် 👉</span>
           </p>
         </div>
       </div>
@@ -133,13 +189,12 @@ function App() {
           value={selectedDate}
           locale="en-US"
         />
-        <div style={{ marginTop: '16px', padding: '10px', background: '#f9fafb', borderRadius: '8px' }}>
+        <div style={{ marginTop: '16px', padding: '10px', background: 'var(--bg-color)', borderRadius: '8px' }}>
           <p style={{ margin: 0, fontSize: '14px' }}>
             <strong>Selected:</strong> {format(selectedDate, 'MMM dd, yyyy')}
           </p>
         </div>
       </div>
-      {/* ဒီနေရာမှာ History List ပြလို့ရပါတယ် */}
     </div>
   );
 
@@ -148,7 +203,7 @@ function App() {
     <div style={{ padding: '20px', paddingBottom: '80px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 className="section-title">📝 မှတ်တမ်းတင်မယ်</h2>
-        <span style={{ fontSize: '14px', color: '#666' }}>{format(selectedDate, 'MMM dd')}</span>
+        <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{format(selectedDate, 'MMM dd')}</span>
       </div>
 
       {/* Mood Selector */}
