@@ -32,16 +32,27 @@ function App() {
 
   // --- 1. Init (Telegram Setup) ---
   useEffect(() => {
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    // Check if running in Telegram
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
 
-    // Theme Colors
-    document.documentElement.style.setProperty('--primary', tg.themeParams.button_color || '#db2777');
-    document.documentElement.style.setProperty('--bg-color', tg.themeParams.secondary_bg_color || '#fdf2f8');
+      // Theme Colors setting
+      const root = document.documentElement;
+      root.style.setProperty('--primary', tg.themeParams.button_color || '#db2777');
+      root.style.setProperty('--bg-color', tg.themeParams.secondary_bg_color || '#fdf2f8');
 
-    if (tg.initDataUnsafe?.user) {
-      setUser(tg.initDataUnsafe.user);
+      if (tg.initDataUnsafe?.user) {
+        setUser(tg.initDataUnsafe.user);
+      } else {
+        // 🛠️ Local Dev အတွက် Mock Data (Telegram မဟုတ်ရင် ဒါပြမယ်)
+        setUser({ first_name: "Local User (Test)" });
+      }
+    } else {
+      // Telegram Script မရှိရင်တောင် မပျက်သွားအောင် ကာကွယ်ခြင်း
+      console.log("Telegram WebApp Script not loaded yet.");
+      setUser({ first_name: "Developer" });
     }
   }, []);
 
