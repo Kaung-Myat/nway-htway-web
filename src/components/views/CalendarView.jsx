@@ -3,7 +3,6 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { addDays, subDays, isSameDay } from 'date-fns';
 import Card from '../ui/Card';
-import Button from '../ui/Button';
 
 const CalendarView = ({ selectedDate, setSelectedDate, cycleData, isLogMode, onConfirm }) => {
   // Memoized helper functions for Calendar Logic to optimize performance
@@ -81,12 +80,12 @@ const CalendarView = ({ selectedDate, setSelectedDate, cycleData, isLogMode, onC
 
       {isLogMode && (
         <div style={{ padding: '20px' }}>
-          <Button
+          <button
             onClick={onConfirm}
-            className="w-full py-3 rounded-xl font-bold text-lg"
+            className="confirm-btn"
           >
             Confirm: {selectedDate.toLocaleDateString()}
-          </Button>
+          </button>
         </div>
       )}
     </div>
