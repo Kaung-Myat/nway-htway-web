@@ -76,15 +76,38 @@ function App() {
   }, []);
 
   // Handle confirm click for log mode
-  const handleConfirmDate = () => {
-    if (window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      const payload = {
-        action: "log_past_date",
-        date: selectedDate.toISOString() // Send the ISO string
-      };
-      tg.sendData(JSON.stringify(payload));
-      tg.close();
+  const handleConfirmDate = async () => {
+    // Check if user exists
+    if (!user?.id) {
+        alert("User info not loaded yet.");
+        return;
+    }
+
+    
+    try {
+        // ⭐ FIX: Use fetch instead of tg.sendData
+        const response = await fetch(`${BOT_API_URL}/api/user`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chatId: user.id,
+                date: selectedDate.toISOString(),
+                // Send empty logData since we are just logging the date
+                logData: {} 
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Date saved successfully! ✅");
+            window.Telegram?.WebApp?.close();
+        } else {
+            alert("Error saving date: " + data.error);
+        }
+    } catch (error) {
+        console.error("API Error:", error);
+        alert("Connection Failed");
     }
   };
 
