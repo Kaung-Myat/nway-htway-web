@@ -3,6 +3,7 @@
  * These styles apply to the entire application
  * Note: The App.css file contains the specific application styles
  */
+@import "tailwindcss";
 
 :root {
   /* Base font settings */
