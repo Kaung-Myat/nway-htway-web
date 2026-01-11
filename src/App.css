@@ -10,12 +10,15 @@
   --primary: var(--tg-theme-button-color, #db2777);           /* Primary button color from Telegram theme */
   --primary-text: var(--tg-theme-button-text-color, #ffffff); /* Primary button text color from Telegram theme */
   --bg-color: var(--tg-theme-bg-color, #fdf2f8);             /* Background color from Telegram theme */
-  --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);    /* Card background color from Telegram theme */
-  --text-main: var(--tg-theme-text-color, #1f2937);          /* Main text color from Telegram theme */
-  --text-muted: var(--tg-theme-hint-color, #6b7280);         /* Muted text color from Telegram theme */
+  --secondary-bg-color: var(--tg-theme-secondary-bg-color, #ffffff); /* Secondary background color from Telegram theme */
+  --text-color: var(--tg-theme-text-color, #1f2937);         /* Main text color from Telegram theme */
+  --hint-color: var(--tg-theme-hint-color, #6b7280);         /* Hint text color from Telegram theme */
 
   /* Additional color variants for UI elements */
   --primary-light: #fbcfe8;  /* Lighter shade of primary color for backgrounds */
+  --text-main: var(--text-color);
+  --text-muted: var(--hint-color);
+  --card-bg: var(--secondary-bg-color);
 }
 
 /* Base styles for the entire application */
@@ -230,4 +233,12 @@ body {
 /* Active navigation item */
 .nav-item.active {
   color: var(--primary);        /* Highlight active tab */
+}
+
+/* Section title */
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-main);
 }

@@ -21,10 +21,18 @@ function App() {
   // Selected date for calendar interactions
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  // Check if we're in log mode (from calendar route)
+  const isLogMode = window.location.pathname.includes('/calendar');
+
   // Initialize the app
   useEffect(() => {
     initializeApp();
-  }, []);
+
+    // If we're in log mode, set the active tab to calendar
+    if (isLogMode) {
+      setActiveTab(TABS.CALENDAR);
+    }
+  }, [isLogMode]);
 
   const initializeApp = async () => {
     if (window.Telegram?.WebApp) {
@@ -32,10 +40,13 @@ function App() {
       tg.ready();
       tg.expand(); // Full screen
 
-      // Apply Telegram theme colors
+      // Apply Telegram theme colors with fallbacks
       const root = document.documentElement;
       if (tg.themeParams.button_color) root.style.setProperty('--primary', tg.themeParams.button_color);
-      if (tg.themeParams.secondary_bg_color) root.style.setProperty('--bg-color', tg.themeParams.secondary_bg_color);
+      if (tg.themeParams.bg_color) root.style.setProperty('--bg-color', tg.themeParams.bg_color);
+      if (tg.themeParams.secondary_bg_color) root.style.setProperty('--secondary-bg-color', tg.themeParams.secondary_bg_color);
+      if (tg.themeParams.text_color) root.style.setProperty('--text-color', tg.themeParams.text_color);
+      if (tg.themeParams.hint_color) root.style.setProperty('--hint-color', tg.themeParams.hint_color);
 
       // Fetch user data
       if (tg.initDataUnsafe?.user) {
@@ -63,6 +74,19 @@ function App() {
       setLoading(false);
     }
   }, []);
+
+  // Handle confirm click for log mode
+  const handleConfirmDate = () => {
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      const payload = {
+        action: "log_past_date",
+        date: selectedDate.toISOString() // Send the ISO string
+      };
+      tg.sendData(JSON.stringify(payload));
+      tg.close();
+    }
+  };
 
   // --- Navigation Handler ---
   const handleCheckInClick = () => {
@@ -93,6 +117,8 @@ function App() {
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             cycleData={cycleData}
+            isLogMode={isLogMode}
+            onConfirm={handleConfirmDate}
           />
         )}
 
@@ -105,8 +131,8 @@ function App() {
         )}
       </div>
 
-      {/* Bottom Navigation (Hidden on Check-in Page) */}
-      {activeTab !== TABS.CHECKIN && (
+      {/* Bottom Navigation (Hidden on Check-in Page and Log Mode) */}
+      {activeTab !== TABS.CHECKIN && !isLogMode && (
         <nav className="bottom-nav">
           <button
             className={`nav-item ${activeTab === TABS.HOME ? 'active' : ''}`}

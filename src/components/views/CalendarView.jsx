@@ -3,8 +3,9 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { addDays, subDays, isSameDay } from 'date-fns';
 import Card from '../ui/Card';
+import Button from '../ui/Button';
 
-const CalendarView = ({ selectedDate, setSelectedDate, cycleData }) => {
+const CalendarView = ({ selectedDate, setSelectedDate, cycleData, isLogMode, onConfirm }) => {
   // Memoized helper functions for Calendar Logic to optimize performance
   const isPastPeriod = useMemo(() => (date) => {
     if (!cycleData?.history) return false;
@@ -49,8 +50,10 @@ const CalendarView = ({ selectedDate, setSelectedDate, cycleData }) => {
   }, [isPastPeriod, isPredictedPeriod, isOvulationDay]);
 
   return (
-    <div style={{ padding: '20px', paddingBottom: '100px' }}>
-      <h2 className="section-title">📅 ပြက္ခဒိန် & ခန့်မှန်းချက်</h2>
+    <div style={{ padding: '20px', paddingBottom: isLogMode ? '20px' : '100px' }}>
+      <h2 className="section-title">
+        {isLogMode ? "Choose the date your period started:" : "📅 ပြက္ခဒိန် & ခန့်မှန်းချက်"}
+      </h2>
       <Card>
         <Calendar
           onChange={setSelectedDate}
@@ -58,21 +61,34 @@ const CalendarView = ({ selectedDate, setSelectedDate, cycleData }) => {
           locale="en-US"
           tileClassName={tileClassName}
         />
-        <div className="legend-container">
-          <div className="legend-item">
-            <div className="legend-dot" style={{ background: 'var(--primary)' }}></div>
-            <span>ရာသီရက်</span>
+        {!isLogMode && (
+          <div className="legend-container">
+            <div className="legend-item">
+              <div className="legend-dot" style={{ background: 'var(--primary)' }}></div>
+              <span>ရာသီရက်</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-dot" style={{ background: 'var(--primary-light)' }}></div>
+              <span>ခန့်မှန်းရက်</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-dot" style={{ background: '#10b981' }}></div>
+              <span>မျိုးဥကြွေရက်</span>
+            </div>
           </div>
-          <div className="legend-item">
-            <div className="legend-dot" style={{ background: 'var(--primary-light)' }}></div>
-            <span>ခန့်မှန်းရက်</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot" style={{ background: '#10b981' }}></div>
-            <span>မျိုးဥကြွေရက်</span>
-          </div>
-        </div>
+        )}
       </Card>
+
+      {isLogMode && (
+        <div style={{ padding: '20px' }}>
+          <Button
+            onClick={onConfirm}
+            className="w-full py-3 rounded-xl font-bold text-lg"
+          >
+            Confirm: {selectedDate.toLocaleDateString()}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
